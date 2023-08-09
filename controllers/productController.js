@@ -1,6 +1,10 @@
 
+const Product = require("../models/ProductModel")
 const getProducts = (req, res) => {
-  res.send('Getting all products!!!');
+
+    Product.create({name: "Panasonic"})
+  
+
 }
 
 module.exports= getProducts;
