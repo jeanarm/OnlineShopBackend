@@ -54,7 +54,7 @@ const productSchema = mongoose.Schema({
     reviews:[
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Review",
+            ref: Review,
         }
        
     ]
@@ -68,5 +68,6 @@ const Product = mongoose.model("Product", productSchema);
 
 productSchema.index({name:"text",description:"text"}, {name:"TextIndex"})
 productSchema.index({"attrs.key":1,"attrs.value":1})
+productSchema.index({ name: 1 }, { unique: true });
 
 module.exports = Product;
