@@ -36,9 +36,9 @@ const newCategory = async (req, res, next) => {
 
 const deleteCategory = async (req, res, next) => {
   try {
-    if (req.body.category !== "Choose category") {
+    if (req.params.category !== "Choose category") {
       const categoryExists = await Category.findOne({
-        name: decodeURIComponent(req.body.category),
+        name: decodeURIComponent(req.params.category),
       }).orFail();
 
       await categoryExists.remove();
