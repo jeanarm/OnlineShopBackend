@@ -1,9 +1,15 @@
 
 const Product = require("../models/ProductModel")
-const getProducts = (req, res) => {
+const getProducts = async (req, res, next) => {
 
-    Product.create({name: "Panasonic"})
-  
+  try {
+    
+    const products = await Product.find({}).sort({name:"asc"}).orFail()
+    res.json(products)
+  } catch (error) {
+    next(error)
+    
+  }
 
 }
 
