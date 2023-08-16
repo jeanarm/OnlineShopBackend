@@ -36,26 +36,6 @@ const getProducts = async (req, res, next) => {
       categoriesQueryCondition = { category: { $in: a } };
     }
 
-    //let attrsQueryCondition = {};
-
-    // if (req.query.attrs) {
-    //   attrsQueryCondition = req.query.attrs.split(",").reduce((acc, item) => {
-    //     if (item) {
-    //       let a = item.split(",")
-    //       let values = [...a]
-    //       values.shift() //remove first item
-    //       let a1 = {
-    //         attrs: { $elemMatch: { key: a[0], value: { $in: values } } }
-    //       };
-    //       acc.push(a1);
-
-    //       console.dir(acc, { depth: null });
-
-    //       return acc;
-    //     } else return acc;
-    //   }, []);
-    //   queryCondition = true;
-    // }
     let attrsQueryCondition = [];
 
     if (req.query.attrs) {
@@ -64,15 +44,15 @@ const getProducts = async (req, res, next) => {
           let a = item.split("-"); // Split by hyphen
           let key = a[0];
           let values = a.slice(1); // Extract values from index 1 onwards
-          
+
           if (key && values.length > 0) {
             let a1 = {
-              attrs: { $elemMatch: { key: key, value: { $in: values } } }
+              attrs: { $elemMatch: { key: key, value: { $in: values } } },
             };
             acc.push(a1);
             console.dir(acc, { depth: null });
           }
-    
+
           return acc;
         } else {
           return acc;
@@ -80,22 +60,7 @@ const getProducts = async (req, res, next) => {
       }, []);
       queryCondition = true; // Assuming you're using queryCondition elsewhere in your code
     }
-    
-
-    if (queryCondition) {
-      query = {
-        $and: [
-          priceQueryCondition,
-          ratingQueryCondition,
-          categoriesQueryCondition,
-          ...attrsQueryCondition,
-        ],
-      };
-    }
-
     const pageNum = Number(req.query.pageNum) || 1;
-    const totalProducts = await Product.countDocuments(query);
-
     //sort by name,price, etc
 
     let sort = {};
@@ -107,7 +72,37 @@ const getProducts = async (req, res, next) => {
       sort = { [sortOpt[0]]: Number(sortOpt[1]) };
     }
 
+    const searchQuery = req.params.searchQuery || "";
+    let searchQuerycondition = {};
+    let select = {};
+
+    if (searchQuery) {
+      queryCondition = true;
+      searchQuerycondition = { $text: { $search: '"' + searchQuery + '"' } };
+
+      select = {
+        score: { $meta: "textScore" },
+      };
+
+      sort = { score: { $meta: "textScore" } };
+    }
+
+    if (queryCondition) {
+      query = {
+        $and: [
+          priceQueryCondition,
+          ratingQueryCondition,
+          categoriesQueryCondition,
+          searchQuerycondition,
+          ...attrsQueryCondition,
+        ],
+      };
+    }
+
+    const totalProducts = await Product.countDocuments(query);
+
     const products = await Product.find(query)
+      .select(select)
       .skip(recordsPerPage * (pageNum - 1))
       .sort(sort)
       .limit(recordsPerPage);
@@ -121,4 +116,36 @@ const getProducts = async (req, res, next) => {
   }
 };
 
-module.exports = getProducts;
+const getProductById = async (req,res,next) =>{
+ 
+    try {
+        const product = await Product.findById(req.params.id).populate("reviews").orFail();
+                res.json(product);
+        
+    } catch (error) {
+        next(error);
+        
+    }
+
+}
+
+const getBestSellers = async (req, res, next) => {
+    try {
+        const products = await Product.aggregate([
+            { $sort: { category: 1, sales: -1 } },
+            { $group: { _id: "$category", doc_with_max_sales: { $first: "$$ROOT" } } },
+            { $replaceWith: "$doc_with_max_sales" },
+            { $match: { sales: { $gt: 0 } } },
+            { $project: { _id: 1, name: 1, images: 1, category: 1, description: 1 } },
+            { $limit: 3 }
+        ])
+        res.json(products)
+
+        res.send("Best sellers")
+    } catch(err) {
+        next(err)
+    }
+}
+
+
+module.exports = {getProducts,getProductById, getBestSellers};

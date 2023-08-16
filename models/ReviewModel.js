@@ -6,6 +6,7 @@ const reviewSchema = mongoose.Schema({
     rating:{type:Number, required:true},
     user:{
         _id:{type:mongoose.Schema.Types.ObjectId, required:true},
+        name: {type:String},
     }
 
 }, {timestamp:true,})
