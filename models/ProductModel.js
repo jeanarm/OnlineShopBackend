@@ -50,7 +50,7 @@ const productSchema = mongoose.Schema({
         {key:{type:String}, value:{type:String}}
     ],
     
-    image: [imageSchema],
+    images: [imageSchema],
     reviews:[
         {
             type: mongoose.Schema.Types.ObjectId,

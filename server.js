@@ -2,9 +2,10 @@
 const express = require('express')
 const app = express()
 const port = 3000
+const fileUpload = require("express-fileupload")
 
 app.use(express.json())
-
+app.use(fileUpload())
 const apiRoutes= require("./routes/apiRoutes")
   
 app.get('/',  async (req, res, next) => {
