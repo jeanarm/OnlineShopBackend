@@ -1,7 +1,7 @@
 const express = require('express');
 const  router = express.Router();
 
-const {getProducts,getProductById,getBestSellers,adminGetProducts, adminDeleteProduct, adminCreateProduct, adminUpdateProduct,adminUpload} = require("../controllers/productController")
+const {getProducts,getProductById,getBestSellers,adminGetProducts, adminDeleteProduct, adminCreateProduct, adminUpdateProduct,adminUpload,adminDeleteProductImage} = require("../controllers/productController")
 router.get("/category/:categoryName/search/:searchQuery",getProducts)
 router.get("/category/:categoryName",getProducts)
 router.get("/search/:searchQuery",getProducts)
@@ -13,6 +13,7 @@ router.get("/", getProducts)
 
 router.get("/admin",adminGetProducts)
 router.delete("/admin/:id",adminDeleteProduct)
+router.delete("/admin/image/:imagePath/:productId",adminDeleteProductImage)
 router.post("/admin/upload",adminUpload)
 router.post("/admin",adminCreateProduct)
 router.put("/admin/:id",adminUpdateProduct)

@@ -1,7 +1,7 @@
 const User = require("../models/UserModel");
 const bcrypt = require("bcryptjs");
 const generateAuthToken = require("../utils/generateAuthToken");
-const { hashPassword } = require("../utils/hashPassword");
+const { hashPassword, comparePasswords } = require("../utils/hashPassword");
 const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({}).select("-password");
@@ -73,7 +73,7 @@ const loginUser = async (req, res, next) => {
 
     const user = await User.findOne({ email });
 
-    if (user) {
+    if (user && comparePasswords(password,user.password)) {
       let cookiesParams = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
