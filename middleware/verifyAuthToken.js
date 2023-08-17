@@ -27,4 +27,15 @@ const verifyIsloggedIn = (req, res, next) =>{
 
 }
 
-module.exports = verifyIsloggedIn
+
+const verifyIsAdmin = (req, res, next) =>{
+
+    if (req.user && req.user.isAdmin){
+        next()
+    }else{
+        return res.status(401).send("Only Admin can access this page")
+    }
+
+}
+
+module.exports = {verifyIsloggedIn,verifyIsAdmin}
