@@ -2,6 +2,8 @@ const User = require("../models/UserModel");
 const bcrypt = require("bcryptjs");
 const generateAuthToken = require("../utils/generateAuthToken");
 const { hashPassword, comparePasswords } = require("../utils/hashPassword");
+const Review = require("../models/ReviewModel")
+const Product = require("../models/ProductModel")
 const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({}).select("-password");
@@ -124,7 +126,7 @@ const updateUserProfile = async (req,res,next) =>{
        
 
       user.name = req.body.name || user.name
-      user.lastName = req.lastName || user.name
+      user.lastName = req.lastName || user.lastName
       user.email = req.body.email || user.email
       user.phoneNumber = req.body.phoneNumber
       user.address = req.body.address 
@@ -144,16 +146,13 @@ const updateUserProfile = async (req,res,next) =>{
           UpdatedUser:{
             _id :user._id,
             name:user.name,
-            LastName:user.lastName,
+            lastName:user.lastName,
             email:user.email,
             isAdmin:user.isAdmin,
             phoneNumber:user.phoneNumber ,
             address:user.address,
             city:user.city,
             country:user.country
-
-
-
           },
         })
 
@@ -179,4 +178,67 @@ try {
 
 }
 
-module.exports = { getUsers, registerUser, loginUser,updateUserProfile,getUserProfile};
+const writeReview = async(req,res,next) =>{
+  try {
+  
+     const {comment,rating} = req.body
+
+     //Validate request
+        
+     if(!(comment && rating)){
+      return res.status(400).send("All inouts are required")
+
+     }
+    
+     //create review id manually because it is needed for saving collection
+    
+    const ObjectId = require("mongodb").ObjectId
+
+    let reviewId = ObjectId()
+    
+    await Review.create(
+      [
+        {
+          _id:reviewId,
+          comment:comment,
+          rating: Number(rating),
+          user:{
+            _id:req.user._id,name:req.user.name + " " + req.user.lastName
+          },
+
+        }
+      ]
+    )
+    const product = await Product.findById(req.params.productId).populate("reviews");
+
+    const alreadyReviewed = product.reviews.find((r)=>r.user._id.toString() === req.user._id.toString())
+
+    if(alreadyReviewed){
+
+      return res.status(400).send("You have already reviewed this product")
+    }
+   
+    let prc = [...product.reviews]
+    prc.push({rating:rating})
+    product.reviews.push(reviewId)
+
+    if(product.reviews.length === 1){
+      product.rating = Number(rating);
+      product.reviewsNumber =1;
+    }else{
+      product.reviewsNumber = product.reviews.length
+      product.rating = prc.map((item)=>Number(item.rating)).reduce(
+        (sum,item)=>sum+item,0)/product.reviews.length
+      
+    }
+    await  product.save()
+    res.send('Review created')
+
+
+  } catch (error) {
+    next(error)
+    
+  }
+}
+
+module.exports = { getUsers, registerUser, loginUser,updateUserProfile,getUserProfile,writeReview};
