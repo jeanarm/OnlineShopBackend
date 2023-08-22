@@ -1,9 +1,9 @@
 const Order = require('../models/OrderModel')
-
-const getOrders = async (req, res, next) =>{
+const ObjectId = require("mongodb").ObjectId
+const getUserOrders = async (req, res, next) =>{
 
   try {
-    const orders =  await Order.find({}).sort({name: "asc"}).orFail()
+    const orders =  await Order.find({user:ObjectId(req.user._id)})
  
     res.json(orders)
 
@@ -12,4 +12,4 @@ const getOrders = async (req, res, next) =>{
   }
 }
 
-module.exports = getOrders
+module.exports = getUserOrders

@@ -274,10 +274,10 @@ const updateUser = async (req,res,next) =>{
 
 const deleteUser =  async (req,res,next) =>{
   try {
-     const user =await User.findById(req.params.id).orFail()
-     user.remove()
+     const user = await User.findById(req.params.id).orFail() 
+      user.remove()
      res.send("User deleted")
-
+    
   } catch (error) {
     next(error)
     
