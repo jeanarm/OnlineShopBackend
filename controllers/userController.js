@@ -233,16 +233,63 @@ const writeReview = async (req, res, next) => {
     res.send("Review created");
   } catch (error) {
     await session.abortTransaction()
-    
+
     next(error);
   }
 };
 
+const getUser = async(req,res,next) =>{
+  try {
+    
+  const user = await User.findById(req.params.id).select("name lastName email isAdmin").orFail();
+
+    return res.send(user)
+
+  } catch (error) {
+    next(error)
+    
+  }
+}
+
+const updateUser = async (req,res,next) =>{
+  try {
+
+    const user = await User.findById(req.params.id).orFail()
+
+   
+      user.name = req.body.name || user.name
+      user.lastName = req.body.lastName || user.name
+      user.email = req.body.email||user.email
+      user.isAdmin = req.body.isAdmin || user.isAdmin
+
+      await user.save()
+      res.send("User updated")
+ 
+    
+  } catch (error) {
+    next(error)
+    
+  }
+}
+
+const deleteUser =  async (req,res,next) =>{
+  try {
+     const user =await User.findById(req.params.id).orFail()
+     user.remove()
+     res.send("User deleted")
+
+  } catch (error) {
+    next(error)
+    
+  }
+}
 module.exports = {
   getUsers,
   registerUser,
   loginUser,
   updateUserProfile,
   getUserProfile,
-  writeReview,
+  writeReview,getUser,
+  updateUser,
+  deleteUser
 };
