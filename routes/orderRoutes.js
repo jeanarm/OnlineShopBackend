@@ -3,13 +3,14 @@ const  router = express.Router();
 
 const { verifyIsloggedIn, verifyIsAdmin } = require('../middleware/verifyAuthToken');
 
-const {getUserOrders,getOrder} = require('../controllers/orderController')
+const {getUserOrders,getOrder,createOrder} = require('../controllers/orderController')
 
 //user routes
 
 router.use(verifyIsloggedIn)
 router.get("/", getUserOrders);
 router.get("/user/:id",getOrder)
+router.post("/",createOrder)
 
 //admin routes
 
