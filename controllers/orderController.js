@@ -84,5 +84,22 @@ try {
 }
 
 }
+const updateOrdeToDelivered = async (req,res,next)=>{
 
-module.exports = {getUserOrders,getOrder,createOrder,updateOrderToPaid}
+  try {
+    const order = await Order.findById(req.params.id).orFail();
+
+    order.isDelivered =true
+    order.deliveredAt = Date.now()
+
+    await order.save()
+    res.send(order)
+    
+  } catch (error) {
+    next(error)
+    
+  }
+
+}
+
+module.exports = {getUserOrders,getOrder,createOrder,updateOrderToPaid,updateOrdeToDelivered}
