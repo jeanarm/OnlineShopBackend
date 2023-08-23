@@ -3,7 +3,7 @@ const  router = express.Router();
 
 const { verifyIsloggedIn, verifyIsAdmin } = require('../middleware/verifyAuthToken');
 
-const {getUserOrders,getOrder,createOrder,updateOrderToPaid,updateOrdeToDelivered} = require('../controllers/orderController')
+const {getUserOrders,getOrder,createOrder,updateOrderToPaid,updateOrdeToDelivered,getOrders} = require('../controllers/orderController')
 
 //user routes
 
@@ -17,5 +17,5 @@ router.put("/paid/:id",updateOrderToPaid)
 
 router.use(verifyIsAdmin)
 router.put("/delivered/:id",updateOrdeToDelivered)
-
+router.get("/admin",getOrders)
 module.exports = router

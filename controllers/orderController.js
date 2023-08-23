@@ -101,5 +101,17 @@ const updateOrdeToDelivered = async (req,res,next)=>{
   }
 
 }
+const getOrders = async (req,res,next) =>{
+  try {
+    
+    const orders = await Order.find({}).populate("user","-password").sort({paymentMethod:"desc"})
 
-module.exports = {getUserOrders,getOrder,createOrder,updateOrderToPaid,updateOrdeToDelivered}
+    res.send(orders)
+
+  } catch (error) {
+    next(error)
+    
+  }
+}
+
+module.exports = {getUserOrders,getOrder,createOrder,updateOrderToPaid,updateOrdeToDelivered,getOrders}
