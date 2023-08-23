@@ -30,20 +30,26 @@ const importData = async() =>{
         await Order.deleteMany({})
         await User.deleteMany({})
 
-        await Category.insertMany(categoryData)
-        await Order.insertMany(ordersData)
-        await User.insertMany(userData)
-        const reviews = await Review.insertMany(reviewsdata)
-        const sampleProducts = productData.map((product)=>{
-
-            reviews.map((review)=>{
-                product.reviews.push(review._id)
+        if(process.argv[2] !== "-d"){
+            await Category.insertMany(categoryData)
+            await Order.insertMany(ordersData)
+            await User.insertMany(userData)
+            const reviews = await Review.insertMany(reviewsdata)
+            const sampleProducts = productData.map((product)=>{
+    
+                reviews.map((review)=>{
+                    product.reviews.push(review._id)
+                })
+                return {...product}
             })
-            return {...product}
-        })
-        await Product.insertMany(sampleProducts)
-        console.log("data saved successfully")
-        process.exit()
+            await Product.insertMany(sampleProducts)
+            console.log("Seeder Data imported successfully")
+            process.exit()
+
+        }
+      console.log("Seeder data deleted sucessfully")
+      process.exit()
+       
         
     } catch (error) {
         console.log("Error saving  data", error)
