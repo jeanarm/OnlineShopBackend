@@ -4,12 +4,17 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server-prod": "node server.js",
+    "server-dev": "npx nodemon server.js",
+    "client": "npm start --prefix ../frontend",
+    "dev": "concurrently --kill-others-on-fail \"npm run server-dev\" \"npm run client\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "concurrently": "^8.2.1",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",
     "express": "^4.17.2",

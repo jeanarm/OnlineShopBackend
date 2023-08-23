@@ -1,7 +1,7 @@
 
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 5000
 const fileUpload = require("express-fileupload")
 const cookieParser = require("cookie-parser")
 app.use(express.json())
