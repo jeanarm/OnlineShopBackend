@@ -50,8 +50,8 @@ const registerUser = async (req, res, next) => {
         )
         .status(201)
         .json({
-          Success: "User created",
-          CreatedUser: {
+          success: "User created",
+          createdUser: {
             _id: user._id,
             name: user.name,
             lastName: user.lastName,
